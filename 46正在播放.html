@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">	
+		<title>专辑详情</title>		
+		<!--<link rel="stylesheet" type="text/css" href="css/43fm-1.css"/>-->
+		<!--<link rel="stylesheet" type="text/css" href="css/Element.css">-->
+		<!--<link rel="stylesheet" href="css/swiper.min.css">-->	
+		<link rel="stylesheet" type="text/css" href="css/46now.css"/>
+		<!--<script src="js/jquery-2.1.4.min.js"></script>-->		
+		<script src="js/MobileSiteJs.js"></script>
+	</head>
+	<style type="text/css">
+		body{
+			background: #f3f3f3;
+		}
+	</style>
+	<body>
+		
+		<video id="Myvideo">
+			<source src="http://pcad.video.baidu.com/cooper_video_8a2f34ccf63f9ebbacdf67180bd72b73.mp4?authorization=bce-auth-%20%20v1%2Fc308a72e7b874edd9115e4614e1d62f6%2F2017-09-22T02%3A48%3A16Z%2F-1%2F%20%20%2F8391160d9be3436eaf794a7b1535fcf6c9e0bdf10b1936dd63ae8082ab2b8b0b&responseCacheControl=max-age%20%20%3D8640000&responseExpires=Sun%2C%2031%20Dec%202017%2010%3A48%3A16%20GMT&_=1509000451170">
+		</video>
+		<div class="now_tiao">
+			<div class="now_da">
+				<span id="next">00:00</span>
+				<div class="now_chang" id="big">
+					<div class="now_duan" id="duan">
+						<div class="now_yuan"></div>
+					</div>
+				</div>
+				<span id="now_zon">00:00</span>
+			</div>
+			<div class="now_quan">
+			<div class="now_din">订阅</div>
+			<ul class="no_play">
+				<li id="now_left"><img src="img/now_left.png"></li>
+				<li id="now_ww"><img id="icon" src="img/now_play.png"></li>
+				<li id="now_right"><img src="img/now_right.png"></li>
+			</ul>
+			<div class="now_xuan">选集</div>
+			</div>
+			
+		</div>
+		
+	</body>
+	<script>
+		var play = document.getElementById('now_ww');
+		var video = document.getElementById('Myvideo');
+		var all = document.getElementById('now_zon');
+		var next = document.getElementById('next');
+		var duan = document.getElementById('duan');
+		var big = document.getElementById('big');
+		var noWww = document.getElementById('icon');
+		var i = 0;
+		var s = true;
+		var time;
+
+		// 保留2位小数
+		function floor(x) {
+			var f = parseFloat(x);
+			if (isNaN(f)) {
+			    return false;
+			}
+			var f = Math.round(x * 100) / 100;
+			var s = f.toString();
+			var rs = s.indexOf('.');
+			if (rs < 0) {
+			    rs = s.length;
+			    s += '.';
+			}
+			while (s.length <= rs + 2) {
+			    s += '0'
+			}
+			return s;
+        }
+
+		video.oncanplay = function () {
+//            console.log(video.duration);
+            all.innerHTML = floor(video.duration);
+        };
+
+//		console.log(parseInt(video.duration))
+
+		function plays() {
+            if (s) {
+                video.play();
+                duan.style.width = '0 !important';
+                noWww.src = 'img/now_zan.png';
+                time = setInterval(function () {
+                    duan.style.width = (video.currentTime/video.duration) * 100 + '%';
+                    if (duan.style.width == '100%') {
+                        clearInterval(time);
+                    }
+                },1);
+                s = !s;
+                if (duan.style.width == '100%') {
+                    clearInterval(time);
+                }
+                video.addEventListener('ended',function () {
+                    clearInterval(times);
+                    next.innerHTML = floor(video.duration);
+                    noWww.src = 'img/now_play.png';
+                    s = true;
+                    i=0;
+                });
+                var times =setInterval(function () {
+                    next.innerHTML = floor(video.currentTime);
+                    if (floor(video.currentTime) < 10) {
+                        next.innerHTML = '0' + floor(video.currentTime);
+                    }
+                },1000);
+            } else {
+                video.pause();
+                clearInterval(time);
+                noWww.src = 'img/now_play.png';
+                s = !s;
+            }
+        }
+
+		play.onclick = function () {
+            if (video.currentTime == video.duration) {
+                duan.style.width = '0';
+                next.innerHTML = '00:00';
+                plays();
+            } else {
+                plays();
+			}
+        };
+        big.addEventListener('touchstart',function (e) {
+            var _x=e.touches[0].pageX;
+            console.log(_x);
+            var s = (_x - big.offsetLeft) / big.clientWidth;
+
+            console.log(video.duration);
+            console.log(parseInt(video.duration) * s);
+            video.currentTime = parseInt(video.duration) * s;
+            duan.style.width = (video.currentTime/video.duration) * 100 + '%';
+        });
+
+        big.addEventListener('touchmove',function (e) {
+            var _x=e.touches[0].pageX;
+            console.log("move",_x);
+            var s = (_x - big.offsetLeft) / big.clientWidth;
+
+            console.log(video.duration);
+            console.log(parseInt(video.duration) * s);
+            video.currentTime = parseInt(video.duration) * s;
+            duan.style.width = (video.currentTime/video.duration) * 100 + '%';
+        })
+
+	</script>
+</html>
